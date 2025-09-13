@@ -1,0 +1,35 @@
+meta:
+  repo: statesflowwishes-sketch/l-LCL-l--Y3zYnC-CnYz3Y2m1l3--l-LCL-l
+  owner: statesflowwishes-sketch
+  related_orgs:
+    - Z3r0CL0cK
+    - sh1ftsync (Enterprise)
+  jurisdiction:
+    - EU
+    - DE
+    - US
+  token_management:
+    github_access: personal + enterprise
+    docker_access: full_permissions
+    last_security_review: 2025-09-13
+controls:
+  - id: EUAI-CLASS-001
+    framework: EU-AI-Act
+    reference: <Artikel/Absatz>
+    obligation_type: classification
+    requirement: "System klassifizieren (z.B. Hochrisiko, begrenztes Risiko)."
+    status: in-progress
+    evidence:
+      - path: compliance/evidence/classification-report.pdf
+      - path: docs/REGELWERK.md#klassifikation
+    owner: <Name>
+    due: 2025-12-31
+  - id: GDPR-DPIA-001
+    framework: GDPR
+    reference: Art.35
+    obligation_type: dpia
+    requirement: "Datenschutz-Folgenabschätzung durchführen und dokumentieren."
+    status: planned
+    evidence:
+      - path: compliance/evidence/DPIA/<datum>.pdf
+    owner: DPO

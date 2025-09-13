@@ -1,0 +1,26 @@
+name: Risiko-Bewertung
+description: Eintrag ins Risiko-Register
+labels: [risk]
+body:
+  - type: input
+    id: risk_id
+    attributes:
+      label: Risiko-ID
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Auswirkung
+      options: [low, medium, high]
+  - type: dropdown
+    id: likelihood
+    attributes:
+      label: Eintrittswahrscheinlichkeit
+      options: [low, medium, high]
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Maßnahmen

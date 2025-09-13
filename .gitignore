@@ -1,0 +1,62 @@
+# Sensible Daten - niemals committen!
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+.secrets/
+tokens/
+.tokens/
+credentials/
+.credentials/
+auth/
+.auth/
+
+# Docker
+Dockerfile.prod
+docker-compose.override.yml
+.dockerignore
+
+# GitHub & Git
+.github/secrets/
+github_token
+gh_token
+GITHUB_TOKEN
+
+# API Keys & Tokens
+*_TOKEN
+*_KEY
+*_SECRET
+*_API_KEY
+*_ACCESS_TOKEN
+*_REFRESH_TOKEN
+*.token
+*.secret
+
+# Logs mit potentiell sensiblen Daten
+*.log
+logs/
+.logs/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# Build & Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+dist/
+build/
+
+# Compliance Evidence (falls personenbezogen)
+compliance/evidence/*.pdf
+compliance/evidence/*.json
+compliance/evidence/personal/

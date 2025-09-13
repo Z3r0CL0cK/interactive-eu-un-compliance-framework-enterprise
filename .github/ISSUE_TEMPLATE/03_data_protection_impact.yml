@@ -1,0 +1,16 @@
+name: Datenschutz-Folgenabschätzung (DPIA)
+description: Erfassung DPIA-relevanter Punkte
+labels: [privacy]
+body:
+  - type: textarea
+    id: data_types
+    attributes:
+      label: Datentypen (PII, sensible Daten, Trainingsdaten)
+  - type: textarea
+    id: processing
+    attributes:
+      label: Verarbeitung & Zwecke
+  - type: textarea
+    id: safeguards
+    attributes:
+      label: Technische & organisatorische Maßnahmen

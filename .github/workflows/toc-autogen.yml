@@ -1,0 +1,13 @@
+name: ToC Auto
+on:
+  push:
+    paths: [ '**/*.md' ]
+jobs:
+  toc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate ToC
+        uses: technote-space/toc-generator@v4
+        with:
+          ACTIONS_STEP_DEBUG: false

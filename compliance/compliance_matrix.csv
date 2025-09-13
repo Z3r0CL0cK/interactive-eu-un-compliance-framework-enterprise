@@ -1,0 +1,6 @@
+framework,reference,control_id,control_title,evidence,status
+EU-AI-Act,Art.<x>,EUAI-CLASS-001,Klassifikation,compliance/evidence/classification-report.pdf,in-progress
+NIS2,Annex I,<id>,Asset-Register,docs/ARCHITEKTUR.md#assets,planned
+CRA,Annex II,<id>,SBOM-Pflicht,compliance/evidence/sbom-syft.json,implemented
+GDPR,Art.35,GDPR-DPIA-001,DPIA,compliance/evidence/DPIA/<datum>.pdf,planned
+NIST-AI-RMF,MAP.1,<id>,Governance-Plan,docs/REGELWERK.md#governance,planned

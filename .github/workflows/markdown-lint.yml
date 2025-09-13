@@ -1,0 +1,43 @@
+name: Lint & Links
+on: 
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Markdown Lint
+        uses: DavidAnson/markdownlint-cli2-action@v17
+        with:
+          globs: |
+            **/*.md
+            **/*.yaml
+            **/*.yml
+          config: '.markdownlint.json'
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: '.'
+          config_file: '.yamllint.yml'
+      - name: Linkcheck
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --accept 200,206,429,403 --exclude-mail **/*.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compliance Check
+        run: |
+          echo "Checking compliance files..."
+          find . -name "*.yaml" -path "./compliance/*" -exec yamllint {} \;
+          if [ -f compliance/compliance.yaml ]; then
+            echo "✅ Compliance configuration found"
+          else
+            echo "❌ Compliance configuration missing"
+            exit 1
+          fi

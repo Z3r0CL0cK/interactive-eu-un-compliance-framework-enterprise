@@ -1,0 +1,7 @@
+mkdocs-material>=9.0.0
+mkdocs-glightbox
+mkdocs-mermaid2-plugin
+mkdocs-table-reader-plugin
+mkdocs-awesome-pages-plugin
+pymdown-extensions
+Pygments

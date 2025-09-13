@@ -1,0 +1,88 @@
+name: 🚀 Interactive Docs Deployment
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: 🎨 Generate Interactive Elements
+      run: |
+        python scripts/generate_interactive_docs.py
+        python scripts/create_badge_matrices.py
+        python scripts/compliance_status_update.py
+    
+    - name: 🏗️ Build MkDocs with Material Theme
+      run: |
+        mkdocs build --strict
+    
+    - name: 📊 Generate Compliance Reports
+      run: |
+        python scripts/generate_reports.py --format html
+        python scripts/create_dashboards.py
+    
+    - name: 🔍 Validate HTML/CSS/JS
+      run: |
+        npm install -g html-validate
+        html-validate site/**/*.html
+    
+    - name: 🌟 Create Interactive Dashboard
+      run: |
+        mkdir -p site/interactive/
+        cp docs/VSCODE_INTEGRATION.md site/interactive/dashboard.html
+        cp -r docs/assets/ site/assets/ 2>/dev/null || true
+    
+    - name: 📄 Setup Pages
+      uses: actions/configure-pages@v3
+    
+    - name: 📤 Upload Artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: site/
+    
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+    
+    - name: 📧 Notify Deployment
+      if: success()
+      run: |
+        echo "🎉 Interactive documentation deployed successfully!"
+        echo "📍 URL: ${{ steps.deployment.outputs.page_url }}"
+        echo "🔗 Dashboard: ${{ steps.deployment.outputs.page_url }}/interactive/dashboard.html"
+    
+    - name: 🔄 Update Repository Status
+      run: |
+        python scripts/update_readme_badges.py --url "${{ steps.deployment.outputs.page_url }}"

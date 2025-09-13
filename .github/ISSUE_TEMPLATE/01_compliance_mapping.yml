@@ -1,0 +1,38 @@
+name: Compliance Mapping
+description: Crosswalk-Eintrag für eine konkrete Anforderung
+title: "[Compliance] <Framework>: <Referenz> → <Control>"
+labels: [compliance]
+body:
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - EU-AI-Act
+        - NIS2
+        - CRA
+        - GDPR
+        - WIPO/EPO/EPA
+        - Grundgesetz/BGB
+        - NIST AI RMF
+  - type: input
+    id: reference
+    attributes:
+      label: Referenz (Artikel/Absatz/Annex)
+  - type: textarea
+    id: requirement
+    attributes:
+      label: Anforderung (Kurzbeschreibung)
+  - type: input
+    id: control_id
+    attributes:
+      label: Control-ID (z. B. EUAI-CLASS-001)
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidenzen (Pfad/URL)
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options: [planned, in-progress, implemented, verified]

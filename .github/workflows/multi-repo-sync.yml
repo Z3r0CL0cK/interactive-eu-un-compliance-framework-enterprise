@@ -1,0 +1,101 @@
+name: Multi-Repo Sync
+on:
+  workflow_dispatch:
+    inputs:
+      sync_target:
+        description: 'Sync target repository'
+        required: true
+        type: choice
+        options:
+          - 'Z3r0CL0cK/compliance-mirror'
+          - 'sh1ftsync/enterprise-docs'
+          - 'all'
+      sync_docs_only:
+        description: 'Sync documentation only'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  GITHUB_TOKEN_PERSONAL: ${{ secrets.GITHUB_TOKEN_PERSONAL }}
+  GITHUB_TOKEN_ENTERPRISE: ${{ secrets.GITHUB_TOKEN_ENTERPRISE }}
+
+jobs:
+  sync-org:
+    if: ${{ github.event.inputs.sync_target == 'Z3r0CL0cK/compliance-mirror' || github.event.inputs.sync_target == 'all' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN_PERSONAL }}
+          fetch-depth: 0
+
+      - name: Sync to Z3r0CL0cK organization
+        env:
+          TARGET_REPO: Z3r0CL0cK/compliance-mirror
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_PERSONAL }}
+        run: |
+          if [ "${{ github.event.inputs.sync_docs_only }}" == "true" ]; then
+            echo "Syncing documentation only..."
+            git remote add target https://${{ secrets.GITHUB_TOKEN_PERSONAL }}@github.com/$TARGET_REPO.git
+            git subtree push --prefix=docs target main --force
+          else
+            echo "Full repository sync..."
+            git remote add target https://${{ secrets.GITHUB_TOKEN_PERSONAL }}@github.com/$TARGET_REPO.git
+            git push target main --force
+          fi
+
+  sync-enterprise:
+    if: ${{ github.event.inputs.sync_target == 'sh1ftsync/enterprise-docs' || github.event.inputs.sync_target == 'all' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN_ENTERPRISE }}
+          fetch-depth: 0
+
+      - name: Sync to Enterprise
+        env:
+          TARGET_REPO: sh1ftsync/enterprise-docs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_ENTERPRISE }}
+        run: |
+          echo "Syncing to Enterprise repository..."
+          git remote add enterprise https://${{ secrets.GITHUB_TOKEN_ENTERPRISE }}@github.com/$TARGET_REPO.git
+          
+          # Create sanitized branch for enterprise
+          git checkout -b enterprise-sync
+          
+          # Remove sensitive files for enterprise sync
+          rm -f .env.example
+          rm -rf compliance/evidence/
+          
+          # Commit sanitized version
+          git add .
+          git commit -m "Enterprise sync: $(date)" || echo "No changes to commit"
+          
+          # Push to enterprise repo
+          git push enterprise enterprise-sync:main --force
+
+  compliance-report:
+    needs: [sync-org, sync-enterprise]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Sync Report
+        run: |
+          echo "## Multi-Repo Sync Report" >> sync-report.md
+          echo "**Date:** $(date)" >> sync-report.md
+          echo "**Target:** ${{ github.event.inputs.sync_target }}" >> sync-report.md
+          echo "**Docs Only:** ${{ github.event.inputs.sync_docs_only }}" >> sync-report.md
+          echo "" >> sync-report.md
+          echo "### Results:" >> sync-report.md
+          echo "- Organization Sync: ${{ needs.sync-org.result }}" >> sync-report.md
+          echo "- Enterprise Sync: ${{ needs.sync-enterprise.result }}" >> sync-report.md
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-report
+          path: sync-report.md

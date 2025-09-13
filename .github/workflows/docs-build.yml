@@ -1,0 +1,35 @@
+name: Docs
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.x' }
+      - name: Install dependencies
+        run: pip install mkdocs-material mkdocs-glightbox mkdocs-mermaid2 mkdocs-table-reader mkdocs-awesome-pages-plugin
+      - name: Build docs
+        run: mkdocs build --strict
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

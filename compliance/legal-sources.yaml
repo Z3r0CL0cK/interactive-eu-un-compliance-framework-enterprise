@@ -1,0 +1,26 @@
+eu:
+  - name: EU-AI-Act
+    id: eur-lex:TODO
+  - name: NIS2
+    id: eur-lex:TODO
+  - name: Cyber Resilience Act
+    id: eur-lex:TODO
+  - name: GDPR
+    id: eur-lex:TODO
+de:
+  - name: Grundgesetz
+    id: gg:TODO
+  - name: BGB
+    id: bgb:TODO
+ip:
+  - name: WIPO
+    id: wipo:TODO
+  - name: EPO
+    id: epo:TODO
+  - name: EPA
+    id: epa:TODO
+us:
+  - name: NIST AI RMF 1.0
+    id: nist:ai-rmf:1.0
+  - name: NIST SP 800-53
+    id: nist:sp:800-53r5

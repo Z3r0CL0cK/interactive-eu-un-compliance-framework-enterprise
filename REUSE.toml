@@ -1,0 +1,6 @@
+version = 1
+
+[[annotations]]
+path = "**/*"
+SPDX-FileCopyrightText = ["2025 <Your Name or Org>"]
+SPDX-License-Identifier = "<SPDX>"
