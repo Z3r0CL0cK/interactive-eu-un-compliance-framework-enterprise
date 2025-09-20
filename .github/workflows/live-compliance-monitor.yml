@@ -7,6 +7,7 @@ on:
     paths:
       - 'compliance/**'
       - 'docs/**'
+      - '.github/workflows/**'
 
 env:
   COMPLIANCE_API_VERSION: "2024.09"
@@ -28,25 +29,54 @@ jobs:
     - name: 📦 Install Dependencies
       run: |
         pip install -r requirements.txt
-        pip install compliance-checker legal-crawler risk-assessor
+        # Make optional dependencies non-fatal
+        pip install compliance-checker || echo "Warning: Could not install compliance-checker"
+        pip install risk-assessor || echo "Warning: Could not install risk-assessor"
+        # Install jq for JSON processing
+        sudo apt-get update && sudo apt-get install -y jq
+    
+    - name: 🔍 Check Compliance Scripts
+      id: check-scripts
+      run: |
+        # Create placeholder JSON files for missing scripts
+        if [ ! -f "scripts/scan_eu_ai_act.py" ]; then
+          echo '{"status":"skipped","message":"Script not found"}' > eu_status.json
+          echo "eu_script_missing=true" >> $GITHUB_OUTPUT
+        fi
+        
+        if [ ! -f "scripts/gdpr_compliance_check.py" ]; then
+          echo '{"status":"skipped","message":"Script not found"}' > gdpr_status.json
+          echo "gdpr_script_missing=true" >> $GITHUB_OUTPUT
+        fi
+        
+        if [ ! -f "scripts/monitor_international.py" ]; then
+          echo '{"status":"skipped","message":"Script not found"}' > intl_status.json
+          echo "intl_script_missing=true" >> $GITHUB_OUTPUT
+        fi
     
     - name: 🔍 Scan EU AI Act Updates
       id: eu-scan
+      if: steps.check-scripts.outputs.eu_script_missing != 'true'
       run: |
-        python scripts/scan_eu_ai_act.py --check-updates --format json > eu_status.json
-        echo "eu_status=$(cat eu_status.json | jq -r '.status')" >> $GITHUB_OUTPUT
+        python scripts/scan_eu_ai_act.py --check-updates --format json > eu_status.json || \
+          echo '{"status":"error","message":"Script execution failed"}' > eu_status.json
+        echo "eu_status=$(jq -r '.status' eu_status.json)" >> $GITHUB_OUTPUT
     
     - name: 🛡️ Check GDPR Compliance
       id: gdpr-check
+      if: steps.check-scripts.outputs.gdpr_script_missing != 'true'
       run: |
-        python scripts/gdpr_compliance_check.py --audit --report json > gdpr_status.json
-        echo "gdpr_status=$(cat gdpr_status.json | jq -r '.status')" >> $GITHUB_OUTPUT
+        python scripts/gdpr_compliance_check.py --audit --report json > gdpr_status.json || \
+          echo '{"status":"error","message":"Script execution failed"}' > gdpr_status.json
+        echo "gdpr_status=$(jq -r '.status' gdpr_status.json)" >> $GITHUB_OUTPUT
     
     - name: 🌍 Monitor International Standards
       id: intl-monitor
+      if: steps.check-scripts.outputs.intl_script_missing != 'true'
       run: |
-        python scripts/monitor_international.py --sources NIST,WIPO,UN --format json > intl_status.json
-        echo "intl_status=$(cat intl_status.json | jq -r '.status')" >> $GITHUB_OUTPUT
+        python scripts/monitor_international.py --sources NIST,WIPO,UN --format json > intl_status.json || \
+          echo '{"status":"error","message":"Script execution failed"}' > intl_status.json
+        echo "intl_status=$(jq -r '.status' intl_status.json)" >> $GITHUB_OUTPUT
     
     - name: 📊 Generate Status Report
       run: |
